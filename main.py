@@ -19,7 +19,7 @@ menu_dict = json.loads(json.dumps(menu_json))['menu']
 
 orders_file = open('order_list.json')
 orders_json = json.load(orders_file)
-orders_dict = json.loads(json.dumps(orders_json))['orders']
+orders_dict = json.loads(json.dumps(orders_json))
 
 
 class OrderProcessor(telepot.helper.InvoiceHandler):
@@ -102,11 +102,11 @@ def send_invoice(seed_tuple):
                                 ":chicken: /McWingsUP - $6.40\n"
                             ))
         elif msg['text'] == '/order':
-            for order in orders_dict:
+            for order in orders_dict['orders']:
                 if chat_id == order['chat_id']:
 
                     description = datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '\n'
-                    for order in orders_dict:
+                    for order in orders_dict['orders']:
                         for item in order['orders']:
                             description += str(item[0]) + '\n'
 
@@ -119,7 +119,7 @@ def send_invoice(seed_tuple):
                         start_parameter=order['chat_id'],
                         currency='SGD',
                         photo_url='https://d1nqx6es26drid.cloudfront.net/app/uploads/2015/06/18104056/ramanda-bundles.png',
-                        prices=[LabeledPrice(label=item[0], amount=item[1]) for order in orders_dict for item in order['orders']],
+                        prices=[LabeledPrice(label=item[0], amount=item[1]) for order in orders_dict['orders'] for item in order['orders']],
                         need_shipping_address=True, need_phone_number=True
                     )
                     print(sent)
@@ -127,6 +127,18 @@ def send_invoice(seed_tuple):
 
         elif msg['text'][:4] == '/add':
             try:
+                name_to_compare = str(msg['text'])
+                name_to_compare = name_to_compare[5:]
+                name_to_compare = name_to_compare.upper()
+                print(name_to_compare)
+                for i in menu_dict:
+                    if name_to_compare == str(i['backend_name']).upper():
+                        if msg['text'][-2:].upper() == 'UP':
+                            orders_dict['orders'][0]['orders'].append([str(i['frontend_name']), i['price_upsize']])
+                        else:
+                            orders_dict['orders'][0]['orders'].append([str(i['frontend_name']), i['price']])
+                with open('order_list.json', 'w') as outfile:
+                    json.dump(orders_dict, outfile)
                 bot.sendMessage(chat_id, text='Item added to cart!')
             except:
                 pass
