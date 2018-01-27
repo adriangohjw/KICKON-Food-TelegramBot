@@ -1,0 +1,21 @@
+{"menu": 
+ [
+    {
+        "frontend_name": "McSpicy",
+        "backend_name": "MCSPICY",
+        "description": "If you are one of those people who like your chicken big on spiciness, this is the sandwich for you. A thick, juicy cutlet of chicken thigh and drum sits fiery hot on a bed of crunchy letture between toasted sesame seed buns - shiok!",
+        "price": "580",
+        "price_upsize": "730",
+        "photo_url": "https://d1nqx6es26drid.cloudfront.net/app/uploads/2015/04/04044056/product-mcspicy.png"
+    },
+    {
+        "frontend_name": "Double McSpicy",
+        "backend_name": "DOUBLEMCSPICY",
+        "description": "Feel the heat. We double the spiciness with two fiery, juicy whole-muscle chicken on a bed of crisp lettuce between toasted sesame seed buns - shiok!",
+        "price": "765",
+        "price_upsize": "915",
+        "photo_url": "https://d1nqx6es26drid.cloudfront.net/app/uploads/2015/04/04044123/product-double-mcspicy.png"
+    }
+]
+}
+    
