@@ -112,7 +112,7 @@ def send_invoice(seed_tuple):
 
                     sent = bot.sendInvoice(
                         chat_id=chat_id,
-                        title='Checkout',
+                        title='Checkout Cart',
                         description=description,
                         payload='a-string-identifying-related-payment-messages-tuvwxyz',
                         provider_token=Token.PAYMENT_PROVIDER_TOKEN,
@@ -124,42 +124,47 @@ def send_invoice(seed_tuple):
                     )
                     print(sent)
                     break
-        else:
+
+        elif msg['text'][:4] == '/add':
             try:
-                name_to_compare = str(msg['text'])
-                name_to_compare = name_to_compare.replace("/", "")
-                name_to_compare = name_to_compare.upper()
-                print(name_to_compare)
-                print(name_to_compare[-2:])
-                for i in menu_dict:
-                    if name_to_compare.replace("UP", "") == str(i['backend_name']).upper():
-                        if name_to_compare[-2:] == "UP":
-                            title = i['frontend_name'] + ' Upsized'
-                            label = 'Meal - Upsize'
-                            price = i['price_upsize']
-                        else:
-                            title = i['frontend_name']
-                            label = 'Meal - No Upsize'
-                            price = i['price']
-                        sent = bot.sendInvoice(
-                            chat_id=chat_id,
-                            title=title,
-                            description=i['description'],
-                            payload='a-string-identifying-related-payment-messages-tuvwxyz',
-                            provider_token=Token.PAYMENT_PROVIDER_TOKEN,
-                            start_parameter=str(chat_id),
-                            currency='SGD',
-                            photo_url=i['photo_url'],
-                            prices=[LabeledPrice(label=label, amount=price)],
-                            need_shipping_address=True, need_phone_number=True
-                        )
-                        print(sent)
-                        break
-                else:
-                    bot.sendMessage(chat_id, text='error sending invoice')
-            except Exception as e:
-                print(e)
-                bot.sendMessage(chat_id, text='Try selecting with the buttons', reply_markup=kb.custom_keyboard)
+                bot.sendMessage(chat_id, text='Item added to cart!')
+            except:
+                pass
+
+        else:
+            name_to_compare = str(msg['text'])
+            name_to_compare = name_to_compare.replace("/", "")
+            name_to_compare = name_to_compare.upper()
+            for i in menu_dict:
+                if name_to_compare.replace("UP", "") == str(i['backend_name']).upper():
+                    if name_to_compare[-2:] == "UP":
+                        title = i['frontend_name'] + ' Upsized'
+                        label = 'Meal - Upsize'
+                        price = i['price_upsize']
+                    else:
+                        title = i['frontend_name']
+                        label = 'Meal - No Upsize'
+                        price = i['price']
+                    sent = bot.sendInvoice(
+                        chat_id=chat_id,
+                        title=title,
+                        description=i['description'],
+                        payload='a-string-identifying-related-payment-messages-tuvwxyz',
+                        provider_token=Token.PAYMENT_PROVIDER_TOKEN,
+                        start_parameter=str(chat_id),
+                        currency='SGD',
+                        photo_url=i['photo_url'],
+                        prices=[LabeledPrice(label=label, amount=price)],
+                        need_shipping_address=True, need_phone_number=True,
+                        reply_markup=kb.custom_inline(price)
+                    )
+                    print(sent)
+                    bot.sendMessage(chat_id, parse_mode='HTML',
+                                    text='<b>Add to cart instead?</b>\n'
+                                         'Click: /add_{}'.format(name_to_compare))
+                    break
+            else:
+                bot.sendMessage(chat_id, text='error sending invoice')
 
 bot = telepot.DelegatorBot(Token.TOKEN, [
     (per_message(flavors=['chat']), call(send_invoice)),

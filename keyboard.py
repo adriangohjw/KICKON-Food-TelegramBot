@@ -1,4 +1,4 @@
-from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton
+from telepot.namedtuple import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 
 # default custom keyboard
 # called by index.py due to unaccounted user's input, prompting them to make a selection from the keyboard instead
@@ -8,6 +8,16 @@ custom_keyboard = ReplyKeyboardMarkup(
     ],
     resize_keyboard=True
 )
+
+
+def custom_inline(price):
+    my_text = "Buy NOW: Pay ${:.2f}".format(int(price)/100)
+    custom_inline = InlineKeyboardMarkup(
+        inline_keyboard=[
+            [InlineKeyboardButton(text=my_text, pay=True)]
+        ]
+    )
+    return custom_inline
 
 # custom_keyboard = ReplyKeyboardMarkup(
 #     keyboard=[
