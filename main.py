@@ -105,10 +105,10 @@ def send_invoice(seed_tuple):
             for order in orders_dict['orders']:
                 if chat_id == order['chat_id']:
 
-                    description = datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '\n'
+                    description = datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '\n\n'
                     for order in orders_dict['orders']:
                         for item in order['orders']:
-                            description += str(item[0]) + '\n'
+                            description += str(item[0]) + ' (${:.2f})\n'.format(int(item[1])/100)
 
                     sent = bot.sendInvoice(
                         chat_id=chat_id,
@@ -125,21 +125,66 @@ def send_invoice(seed_tuple):
                     print(sent)
                     break
 
-        elif msg['text'][:4] == '/add':
+        elif msg['text'] == '/cart':  # view cart
+            for order in orders_dict['orders']:
+                if chat_id == order['chat_id']:
+                    description = '<b>Click</b> /order <b>to checkout!</b>\n\n'
+                    for order in orders_dict['orders']:
+                        for item in order['orders']:
+                            description += str(item[0]) + ' (${:.2f})\n'.format(int(item[1])/100)
+                        description += '\n'
+                        for item in order['orders']:
+                            description += '/drop_' + str(item[0]).replace(' ', '_') + '\n'
+            bot.sendMessage(chat_id, text=description, parse_mode='HTML')
+
+        elif msg['text'][:4] == '/add':  # add individual items to order list
+            if len(orders_dict['orders'][0]['orders']) == 10:
+                bot.sendMessage(chat_id, text='Sorry, maximum order is 10 items!\n'
+                                              'Drop item(s) or /order now!')
+            else:
+                try:
+                    name_to_compare = str(msg['text'])
+                    name_to_compare = name_to_compare[5:]
+                    name_to_compare = name_to_compare.upper()
+                    print(name_to_compare)
+                    for i in menu_dict:
+                        if name_to_compare[:-2] == str(i['backend_name']).upper():
+                            if msg['text'][-2:].upper() == 'UP':
+                                orders_dict['orders'][0]['orders'].append([str(i['frontend_name'])+' Upsize', i['price_upsize']])
+                                bot.sendMessage(chat_id, text='Item added to cart! View /cart!')
+                                break
+                            else:
+                                orders_dict['orders'][0]['orders'].append([str(i['frontend_name']), i['price']])
+                                bot.sendMessage(chat_id, text='Item added to cart! View /cart!')
+                                break
+                    else:
+                        bot.sendMessage(chat_id, text='No item added, try again?')
+                    with open('order_list.json', 'w') as outfile:
+                        json.dump(orders_dict, outfile)
+                except:
+                    bot.sendMessage(chat_id, text='Error, try again!')
+
+        elif msg['text'][:5] == '/drop':  # add individual items to order list
             try:
                 name_to_compare = str(msg['text'])
-                name_to_compare = name_to_compare[5:]
+                name_to_compare = name_to_compare[6:]
                 name_to_compare = name_to_compare.upper()
                 print(name_to_compare)
-                for i in menu_dict:
-                    if name_to_compare == str(i['backend_name']).upper():
-                        if msg['text'][-2:].upper() == 'UP':
-                            orders_dict['orders'][0]['orders'].append([str(i['frontend_name']), i['price_upsize']])
-                        else:
-                            orders_dict['orders'][0]['orders'].append([str(i['frontend_name']), i['price']])
-                with open('order_list.json', 'w') as outfile:
+                for i in orders_dict['orders'][0]['orders']:
+                    if name_to_compare.upper()[-2:] == 'UP':
+                        if name_to_compare.upper().replace('UP', '') == str(i[0]).replace(' Upsize', ''):
+                            del i[0]
+                            bot.sendMessage(chat_id, text='Item removed from cart!')
+                            break
+                    else:
+                        if name_to_compare.upper().replace('UP', '') == str(i[0]):
+                            del i[0]
+                            bot.sendMessage(chat_id, text='Item removed from cart!')
+                            break
+                else:
+                    bot.sendMessage(chat_id, text='No item removed, check again?')
+                with open('order_list_2.json', 'w') as outfile:
                     json.dump(orders_dict, outfile)
-                bot.sendMessage(chat_id, text='Item added to cart!')
             except:
                 pass
 
