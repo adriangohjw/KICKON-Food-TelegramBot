@@ -74,7 +74,8 @@ def send_invoice(seed_tuple):
                                 ":backhand_index_pointing_down: Below is the list of commands and what they do\n\n"
                                 ":white_heavy_check_mark: <b>User's command</b>\n"
                                 "/menu - Display the list of food and their prices\n"
-                                "/pending - Check the number of pending order\n\n"
+                                "/cart - Show items in cart\n"
+                                "/order - Checkout items in cart\n\n"
                                 ":credit_card: Use credit card number <b>4242 4242 4242 4242</b> if you do not have one "
                                 "and would want to test out the bot\n\n"))
         elif msg['text'] == '/menu':
