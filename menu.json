@@ -2,19 +2,84 @@
  [
     {
         "frontend_name": "McSpicy",
-        "backend_name": "MCSPICY",
+        "backend_name": "McSpicy",
         "description": "If you are one of those people who like your chicken big on spiciness, this is the sandwich for you. A thick, juicy cutlet of chicken thigh and drum sits fiery hot on a bed of crunchy letture between toasted sesame seed buns - shiok!",
         "price": "580",
         "price_upsize": "730",
+        "items": "McSpicy Burger, Medium Fries, Medium Coke",
         "photo_url": "https://d1nqx6es26drid.cloudfront.net/app/uploads/2015/04/04044056/product-mcspicy.png"
     },
     {
         "frontend_name": "Double McSpicy",
-        "backend_name": "DOUBLEMCSPICY",
+        "backend_name": "DoubleMcSpicy",
         "description": "Feel the heat. We double the spiciness with two fiery, juicy whole-muscle chicken on a bed of crisp lettuce between toasted sesame seed buns - shiok!",
         "price": "765",
         "price_upsize": "915",
+        "items": "Double McSpicy Burger, Medium Fries, Medium Coke",
         "photo_url": "https://d1nqx6es26drid.cloudfront.net/app/uploads/2015/04/04044123/product-double-mcspicy.png"
+    },
+    {
+        "frontend_name": "McChicken",
+        "backend_name": "McChicken",
+        "description": "An evergreen favourite, McChicken has been winning fans with its wholesome great taste - tender chicken patties plus the right touch of mayo. Just classic.",
+        "price": "395",
+        "price_upsize": "545",
+        "items": "McChicken Burger, Medium Fries, Medium Coke",
+        "photo_url": "https://d1nqx6es26drid.cloudfront.net/app/uploads/2015/04/04043910/product-mcchicken.png"
+    },
+    {
+        "frontend_name": "BigMac",
+        "backend_name": "BigMac",
+        "description": "Since its introduction in 1968, the Big Mac has grown to become an icon for burger lovers everywhere. Our two all-beef patties, special sauce, lettuce, cheese, pickles, onions on a sesame seed bun recipe makes a one-of-a-kind experience",
+        "price": "600",
+        "price_upsize": "750",
+        "items": "BigMac Burger, Medium Fries, Medium Coke",
+        "photo_url": "https://d1nqx6es26drid.cloudfront.net/app/uploads/2015/04/04043402/product-big-mac.png"
+    },
+    {
+        "frontend_name": "CheeseBurger",
+        "backend_name": "CheeseBurger",
+        "description": "Start with a perfect McDonald's Hamburger. Put warm, melting cheese on the patty and take the experience to the next level. Need we say more?",
+        "price": "280",
+        "price_upsize": "430",
+        "items": "CheeseBurger Burger, Medium Fries, Medium Coke",
+        "photo_url": "https://d1nqx6es26drid.cloudfront.net/app/uploads/2015/04/04043431/product-cheeseburger.png"
+    },
+    {
+        "frontend_name": "Double CheeseBurger",
+        "backend_name": "DoubleCheeseBurger",
+        "description": "Seeing double? We do the double on the beef and cheese to double your enjoyment with every one bite.",
+        "price": "460",
+        "price_upsize": "610",
+        "items": "Double CheeseBurger Burger, Medium Fries, Medium Coke",
+        "photo_url": "https://d1nqx6es26drid.cloudfront.net/app/uploads/2015/04/04043525/product-double-cheeseburger.png"
+    },
+    {
+        "frontend_name": "Chicken McNuggets",
+        "backend_name": "ChickenMcNuggets",
+        "description": "A boxful of bite-sized treats, beautifully battered - good as a quick snack or as part of a hearty meal. Our Chicken McNuggets are a childhood favourite that you won't outgrow",
+        "price": "490",
+        "price_upsize": "640",
+        "items": "Chicken McNuggets, Medium Fries, Medium Coke",
+        "photo_url": "https://d1nqx6es26drid.cloudfront.net/app/uploads/2015/04/04043620/product-chicken-mcnuggets.png"
+    },
+    {
+        "frontend_name": "McWings",
+        "backend_name": "McWings",
+        "description": "If chicken's your thing, our McWings will send you right over the edge. Coated with a light batter, we guarantee you'll be impressed.",
+        "price": "490",
+        "price_upsize": "640",
+        "items": "McWings, Medium Fries, Medium Coke",
+        "photo_url": "https://d1nqx6es26drid.cloudfront.net/app/uploads/2015/04/04044217/product-mcwings.png"
+    },
+    {
+        "frontend_name": "Filet-O-Fish",
+        "backend_name": "FiletOFish",
+        "description": "The catch of the day is sure a great catch at McDonald's. A fish fillet, smothered with tangy tartar sauce and half a slice of cheese between tender steamed buns is simply pure ocean heaven.",
+        "price": "460",
+        "price_upsize": "610",
+        "items": "FilletOFish, Medium Fries, Medium Coke",
+        "photo_url": "https://d1nqx6es26drid.cloudfront.net/app/uploads/2015/04/04033347/burger2.png"
     }
 ]
 }
