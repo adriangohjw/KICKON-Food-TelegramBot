@@ -1,5 +1,6 @@
 from access import Token
 import keyboard as kb
+import pyrebase_script as pb
 
 import json
 import time
@@ -49,11 +50,20 @@ class OrderProcessor(telepot.helper.InvoiceHandler):
         bot.answerPreCheckoutQuery(query_id, True)
 
     def on_chat_message(self, msg):
+        pprint(msg)
         content_type, chat_type, chat_id = telepot.glance(msg)
 
         if content_type == 'successful_payment':
             print('Successful payment RECEIVED!!!')
-            pprint(msg)
+            phone_no = msg['successful_payment']['order_info']['phone_number']
+            name = msg['chat']['username']
+            prod = msg['successful_payment']['invoice_payload']
+            pb.push_order(chat_id=int(chat_id),
+                          name=str(name),
+                          phone_no=int(phone_no),
+                          prod=str(prod))
+            bot.sendMessage(chat_id, parse_mode='HTML',
+                            text='<b>Thank you for the order!</b>')
         else:
             print('Chat message:')
             pprint(msg)
@@ -76,8 +86,8 @@ def send_invoice(seed_tuple):
                                 "/menu - Display the list of food and their prices\n"
                                 "/cart - Show items in cart\n"
                                 "/order - Checkout items in cart\n\n"
-                                ":credit_card: Use credit card number <b>4242 4242 4242 4242</b> if you do not have one "
-                                "and would want to test out the bot\n\n"))
+                                ":credit_card: Use credit card number <b>4242 4242 4242 4242</b> if you do not have one"
+                                " and would want to test out the bot\n\n"))
         elif msg['text'] == '/menu':
             bot.sendMessage(chat_id, parse_mode='HTML',
                             text=emojize(
@@ -104,6 +114,7 @@ def send_invoice(seed_tuple):
                             ))
 
         elif msg['text'] == '/order':
+
             for order in orders_dict['orders']:
                 if chat_id == order['chat_id']:
 
@@ -122,7 +133,7 @@ def send_invoice(seed_tuple):
                             chat_id=chat_id,
                             title='Checkout Cart',
                             description=description,
-                            payload='a-string-identifying-related-payment-messages-tuvwxyz',
+                            payload='test',
                             provider_token=Token.PAYMENT_PROVIDER_TOKEN,
                             start_parameter=order['chat_id'],
                             currency='SGD',
@@ -183,7 +194,7 @@ def send_invoice(seed_tuple):
                             name_to_compare = name_to_compare.upper()
                             print(name_to_compare)
                             for i in menu_dict:
-                                if name_to_compare[:-2] == str(i['backend_name']).upper():
+                                if name_to_compare.replace('UP', '') == str(i['backend_name']).upper():
                                     if msg['text'][-2:].upper() == 'UP':
                                         order['orders'].append([str(i['frontend_name'])+' Upsize', int(i['price_upsize'])])
                                         bot.sendMessage(chat_id, text='Item added to cart! View /cart!')
@@ -194,12 +205,15 @@ def send_invoice(seed_tuple):
                                         break
                             else:
                                 bot.sendMessage(chat_id, text='No item added, try again?')
+                                break
 
                             with open('order_list.json', 'w') as outfile:
                                 json.dump(orders_dict, outfile)
+                                break
 
                         except:
                             bot.sendMessage(chat_id, text='No item added, try again?')
+                            break
 
             else:  # no such user in json file
 
@@ -209,7 +223,7 @@ def send_invoice(seed_tuple):
                     name_to_compare = name_to_compare.upper()
                     print(name_to_compare)
                     for i in menu_dict:
-                        if name_to_compare[:-2] == str(i['backend_name']).upper():
+                        if name_to_compare.replace('UP', '') == str(i['backend_name']).upper():
                             if msg['text'][-2:].upper() == 'UP':
                                 orders_dict['orders'].append({'chat_id': int(chat_id), "orders": [[str(i['frontend_name'])+' Upsize', int(i['price_upsize'])]]})
                                 bot.sendMessage(chat_id, text='Item added to cart! View /cart!')
@@ -245,7 +259,6 @@ def send_invoice(seed_tuple):
                             name_to_compare = name_to_compare.replace('_', ' ')
                             name_to_compare = name_to_compare.upper()
                             print(name_to_compare)
-                            print(order['orders'])
                             for i in range(len(order['orders'])):
                                 name_in_dict = order['orders'][i][0]
                                 if 'UPSIZE' in name_to_compare.upper():
@@ -262,12 +275,15 @@ def send_invoice(seed_tuple):
                                         break
                             else:
                                 bot.sendMessage(chat_id, text='No item removed, try again?')
+                                break
 
                             with open('order_list.json', 'w') as outfile:
                                 json.dump(orders_dict, outfile)
+                                break
 
                         except:
                             bot.sendMessage(chat_id, text='No item removed, try again?')
+                            break
 
             else:  # no such user in json file
 
@@ -299,7 +315,7 @@ def send_invoice(seed_tuple):
                         chat_id=chat_id,
                         title=title,
                         description=i['description'],
-                        payload='a-string-identifying-related-payment-messages-tuvwxyz',
+                        payload=title,
                         provider_token=Token.PAYMENT_PROVIDER_TOKEN,
                         start_parameter=str(chat_id),
                         currency='SGD',
