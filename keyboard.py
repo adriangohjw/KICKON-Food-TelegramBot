@@ -9,6 +9,14 @@ custom_keyboard = ReplyKeyboardMarkup(
     resize_keyboard=True
 )
 
+default_keyboard = ReplyKeyboardMarkup(
+    keyboard=[
+        [KeyboardButton(text='/help'), KeyboardButton(text='/menu')],
+        [KeyboardButton(text='/cart'), KeyboardButton(text='/order')]
+    ],
+    resize_keyboard=True
+)
+
 
 def custom_inline(price):
     my_text = "Buy NOW: Pay ${:.2f}".format(int(price)/100)

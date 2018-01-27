@@ -67,7 +67,7 @@ def send_invoice(seed_tuple):
     print(content_type, chat_type, chat_id)
 
     if content_type == 'text':
-        if msg['text'] == '/help':
+        if msg['text'] in ('/help', '/start'):
             bot.sendMessage(chat_id, parse_mode='HTML',
                             text=emojize(
                                 ":hamburger: Hi! You can now order food from <b>NUS McDonald's</b>! \n"
@@ -101,29 +101,43 @@ def send_invoice(seed_tuple):
                                 ":chicken: /ChickenMcNuggetsUP - $6.40\n"
                                 ":chicken: /McWingsUP - $6.40\n"
                             ))
+
         elif msg['text'] == '/order':
             for order in orders_dict['orders']:
                 if chat_id == order['chat_id']:
 
-                    description = datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '\n\n'
-                    for order in orders_dict['orders']:
-                        for item in order['orders']:
-                            description += str(item[0]) + ' (${:.2f})\n'.format(int(item[1])/100)
+                    if len(order['orders']) == 0:
+                        bot.sendMessage(chat_id, text='No item in cart!\n'
+                                                      'Add them from /menu now!')
+                        break
 
-                    sent = bot.sendInvoice(
-                        chat_id=chat_id,
-                        title='Checkout Cart',
-                        description=description,
-                        payload='a-string-identifying-related-payment-messages-tuvwxyz',
-                        provider_token=Token.PAYMENT_PROVIDER_TOKEN,
-                        start_parameter=order['chat_id'],
-                        currency='SGD',
-                        photo_url='https://d1nqx6es26drid.cloudfront.net/app/uploads/2015/06/18104056/ramanda-bundles.png',
-                        prices=[LabeledPrice(label=item[0], amount=item[1]) for order in orders_dict['orders'] for item in order['orders']],
-                        need_shipping_address=True, need_phone_number=True
-                    )
-                    print(sent)
-                    break
+                    else:
+                        description = datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '\n\n'
+                        for order in orders_dict['orders']:
+                            for item in order['orders']:
+                                description += str(item[0]) + ' (${:.2f})\n'.format(int(item[1])/100)
+
+                        sent = bot.sendInvoice(
+                            chat_id=chat_id,
+                            title='Checkout Cart',
+                            description=description,
+                            payload='a-string-identifying-related-payment-messages-tuvwxyz',
+                            provider_token=Token.PAYMENT_PROVIDER_TOKEN,
+                            start_parameter=order['chat_id'],
+                            currency='SGD',
+                            photo_url='https://d1nqx6es26drid.cloudfront.net/app/uploads/2015/06/18104056/ramanda-bundles.png',
+                            prices=[LabeledPrice(label=item[0], amount=item[1]) for order in orders_dict['orders'] for item in order['orders']],
+                            need_shipping_address=True, need_phone_number=True
+                        )
+                        print(sent)
+                        break
+
+            else:  # no such user in json file
+                orders_dict['orders'].append({'chat_id': int(chat_id), "orders": []})
+                with open('order_list.json', 'w') as outfile:
+                    json.dump(orders_dict, outfile)
+                bot.sendMessage(chat_id, text='No item in cart!\n'
+                                              'Add them from /menu now!')
 
         elif msg['text'] == '/cart':  # view cart
 
@@ -133,6 +147,8 @@ def send_invoice(seed_tuple):
                     if len(order['orders']) == 0:
                         bot.sendMessage(chat_id, text='No item in cart!\n'
                                                       'Add them from /menu now!')
+                        break
+
                     else:
                         description = '<b>Click</b> /order <b>to checkout!</b>\n\n'
                         for item in order['orders']:
@@ -141,6 +157,14 @@ def send_invoice(seed_tuple):
                         for item in order['orders']:
                             description += '/drop_' + str(item[0]).replace(' ', '_') + '\n'
                         bot.sendMessage(chat_id, text=description, parse_mode='HTML')
+                        break
+
+            else:  # no such user in json file
+                orders_dict['orders'].append({'chat_id': int(chat_id), "orders": []})
+                with open('order_list.json', 'w') as outfile:
+                    json.dump(orders_dict, outfile)
+                bot.sendMessage(chat_id, text='No item in cart!\n'
+                                              'Add them from /menu now!')
 
         elif msg['text'][:4] == '/add':  # add individual items to order list
 
@@ -150,6 +174,7 @@ def send_invoice(seed_tuple):
                     if len(order['orders']) == 10:
                         bot.sendMessage(chat_id, text='Sorry, maximum order is 10 items!\n'
                                                       'Drop item(s) or /order now!')
+
                     else:
                         try:
                             name_to_compare = str(msg['text'])
@@ -168,10 +193,41 @@ def send_invoice(seed_tuple):
                                         break
                             else:
                                 bot.sendMessage(chat_id, text='No item added, try again?')
+
                             with open('order_list.json', 'w') as outfile:
                                 json.dump(orders_dict, outfile)
+
                         except:
                             bot.sendMessage(chat_id, text='No item added, try again?')
+
+            else:  # no such user in json file
+
+                try:
+                    name_to_compare = str(msg['text'])
+                    name_to_compare = name_to_compare[5:]
+                    name_to_compare = name_to_compare.upper()
+                    print(name_to_compare)
+                    for i in menu_dict:
+                        if name_to_compare[:-2] == str(i['backend_name']).upper():
+                            if msg['text'][-2:].upper() == 'UP':
+                                orders_dict['orders'].append({'chat_id': int(chat_id), "orders": [[str(i['frontend_name'])+' Upsize', int(i['price_upsize'])]]})
+                                bot.sendMessage(chat_id, text='Item added to cart! View /cart!')
+                                break
+                            else:
+                                orders_dict['orders'].append({'chat_id': int(chat_id), "orders": [[str(i['frontend_name']), int(i['price'])]]})
+                                bot.sendMessage(chat_id, text='Item added to cart! View /cart!')
+                                break
+                    else:
+                        bot.sendMessage(chat_id, text='No item added, try again?')
+
+                    with open('order_list.json', 'w') as outfile:
+                        json.dump(orders_dict, outfile)
+
+                except:
+                    bot.sendMessage(chat_id, text='No item added, try again?')
+                    orders_dict['orders'].append({'chat_id': int(chat_id), "orders": []})
+                    with open('order_list.json', 'w') as outfile:
+                        json.dump(orders_dict, outfile)
 
         elif msg['text'][:5] == '/drop':  # drop individual items to order list
             for order in orders_dict['orders']:
@@ -204,11 +260,23 @@ def send_invoice(seed_tuple):
                                         print(order['orders'])
                                         break
                             else:
-                                bot.sendMessage(chat_id, text='No item removed, check again?')
+                                bot.sendMessage(chat_id, text='No item removed, try again?')
+
                             with open('order_list.json', 'w') as outfile:
                                 json.dump(orders_dict, outfile)
+
                         except:
-                            bot.sendMessage(chat_id, text='No item removed, check again?')
+                            bot.sendMessage(chat_id, text='No item removed, try again?')
+
+            else:  # no such user in json file
+
+                bot.sendMessage(chat_id, text='No item removed, try again?')
+                try:
+                    orders_dict['orders'].append({'chat_id': int(chat_id), "orders": []})
+                    with open('order_list.json', 'w') as outfile:
+                        json.dump(orders_dict, outfile)
+                except:
+                    pass
 
         else:
             name_to_compare = str(msg['text'])
@@ -216,6 +284,7 @@ def send_invoice(seed_tuple):
             name_to_compare = name_to_compare.upper()
             for i in menu_dict:
                 if name_to_compare.replace("UP", "") == str(i['backend_name']).upper():
+
                     if name_to_compare[-2:] == "UP":
                         title = i['frontend_name'] + ' Upsized'
                         label = 'Meal - Upsize'
@@ -224,6 +293,7 @@ def send_invoice(seed_tuple):
                         title = i['frontend_name']
                         label = 'Meal - No Upsize'
                         price = i['price']
+
                     sent = bot.sendInvoice(
                         chat_id=chat_id,
                         title=title,
@@ -242,8 +312,11 @@ def send_invoice(seed_tuple):
                                     text='<b>Add to cart instead?</b>\n'
                                          'Click: /add_{}'.format(name_to_compare))
                     break
+
             else:
-                bot.sendMessage(chat_id, text='error sending invoice')
+                bot.sendMessage(chat_id, reply_markup=kb.default_keyboard,
+                                text='Sorry, there seems to be an error!\n'
+                                     'Try out some of the actions below?')
 
 bot = telepot.DelegatorBot(Token.TOKEN, [
     (per_message(flavors=['chat']), call(send_invoice)),
