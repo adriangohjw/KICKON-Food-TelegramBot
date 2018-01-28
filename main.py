@@ -66,12 +66,12 @@ class OrderProcessor(telepot.helper.InvoiceHandler):
                 all_items_list.pop(len(all_items_list)-1)
                 for item in all_items_list:
                     order_id = int(pb.get_num_entry()) + 1
-                    if 'UPSIZE' in item:
+                    if 'UPSIZE' in item.upper():
                         pb.push_order(order_id=order_id,
                                       chat_id=int(chat_id),
                                       name=str(name),
                                       phone_no=int(phone_no),
-                                      prod=str(item),
+                                      prod=str(item).replace(' Upsize', ''),
                                       current_datetime=current_datetime,
                                       upsize=1)
                     else:
@@ -100,7 +100,7 @@ class OrderProcessor(telepot.helper.InvoiceHandler):
                                   chat_id=int(chat_id),
                                   name=str(name),
                                   phone_no=int(phone_no),
-                                  prod=str(prod),
+                                  prod=str(prod).replace(' Upsize', ''),
                                   current_datetime=current_datetime,
                                   upsize=1)
                 else:
