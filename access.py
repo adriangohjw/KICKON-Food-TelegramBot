@@ -1,3 +1,3 @@
 class Token:
-    TOKEN = '401419475:AAHFn2oqMKJ18pWfJ2ZD2JcEG9m3CPgDvWI'
-    PAYMENT_PROVIDER_TOKEN = '284685063:TEST:NTZhMTUyODI4NmVk'
+    TOKEN = ''  # enter your telegram api token
+    PAYMENT_PROVIDER_TOKEN = ''  # enter your payment processor (e.g. STRIPE) api token
