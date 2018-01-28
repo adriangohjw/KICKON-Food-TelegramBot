@@ -58,12 +58,20 @@ class OrderProcessor(telepot.helper.InvoiceHandler):
             phone_no = msg['successful_payment']['order_info']['phone_number']
             name = msg['chat']['username']
             prod = msg['successful_payment']['invoice_payload']
-            pb.push_order(chat_id=int(chat_id),
+            current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            order_id = int(pb.get_num_entry()) + 1
+            pb.push_order(order_id=order_id,
+                          chat_id=int(chat_id),
                           name=str(name),
                           phone_no=int(phone_no),
-                          prod=str(prod))
-            bot.sendMessage(chat_id, parse_mode='HTML',
-                            text='<b>Thank you for the order!</b>')
+                          prod=str(prod),
+                          current_datetime=current_datetime)
+            bot.sendMessage(chat_id=chat_id, parse_mode='HTML',
+                            text='Hi ' + '<b>' + name + '</b>\n'
+                                 + 'You purchased ' + '<b>' + prod + '</b>\n'
+                                 + ' on ' + '<b>' + current_datetime + '</b>\n'
+                                 + 'Your order number is ' + str(order_id)
+                                 + '\n\nThanks for the order!')
         else:
             print('Chat message:')
             pprint(msg)
