@@ -59,19 +59,62 @@ class OrderProcessor(telepot.helper.InvoiceHandler):
             name = msg['chat']['username']
             prod = msg['successful_payment']['invoice_payload']
             current_datetime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            order_id = int(pb.get_num_entry()) + 1
-            pb.push_order(order_id=order_id,
-                          chat_id=int(chat_id),
-                          name=str(name),
-                          phone_no=int(phone_no),
-                          prod=str(prod),
-                          current_datetime=current_datetime)
-            bot.sendMessage(chat_id=chat_id, parse_mode='HTML',
-                            text='Hi ' + '<b>' + name + '</b>\n'
-                                 + 'You purchased ' + '<b>' + prod + '</b>\n'
-                                 + ' on ' + '<b>' + current_datetime + '</b>\n'
-                                 + 'Your order number is ' + str(order_id)
-                                 + '\n\nThanks for the order!')
+            if str(prod)[:3] == 'CC:':
+                pprint(msg)
+                all_items = str(prod)[3:]
+                all_items_list = all_items.split(':')
+                all_items_list.pop(len(all_items_list)-1)
+                for item in all_items_list:
+                    order_id = int(pb.get_num_entry()) + 1  
+                    if 'UPSIZE' in item:
+                        pb.push_order(order_id=order_id,
+                                      chat_id=int(chat_id),
+                                      name=str(name),
+                                      phone_no=int(phone_no),
+                                      prod=str(item),
+                                      current_datetime=current_datetime,
+                                      upsized=1)
+                    else:
+                        pb.push_order(order_id=order_id,
+                                      chat_id=int(chat_id),
+                                      name=str(name),
+                                      phone_no=int(phone_no),
+                                      prod=str(item),
+                                      current_datetime=current_datetime)
+                    bot.sendMessage(chat_id=chat_id, parse_mode='HTML',
+                                    text='Hi ' + '<b>' + name + '</b>\n'
+                                         + 'You purchased ' + '<b>' + prod + '</b>\n'
+                                         + ' on ' + '<b>' + current_datetime + '</b>\n\n'
+                                         + 'Your order number is ' + str(order_id)
+                                         + '\nThanks for the order!')
+                for order in orders_dict['orders']:
+                    if chat_id == order['chat_id']:
+                        order['orders'] = []
+                        with open('order_list.json', 'w') as outfile:
+                            json.dump(orders_dict, outfile)
+                        break
+            else:
+                if 'UPSIZE' in str(prod).upper():
+                    pb.push_order(order_id=order_id,
+                                  chat_id=int(chat_id),
+                                  name=str(name),
+                                  phone_no=int(phone_no),
+                                  prod=str(prod),
+                                  current_datetime=current_datetime,
+                                  upsized=1)
+                else:
+                    pb.push_order(order_id=order_id,
+                                  chat_id=int(chat_id),
+                                  name=str(name),
+                                  phone_no=int(phone_no),
+                                  prod=str(prod),
+                                  current_datetime=current_datetime)
+                bot.sendMessage(chat_id=chat_id, parse_mode='HTML',
+                                text='Hi ' + '<b>' + name + '</b>\n'
+                                     + 'You purchased ' + '<b>' + prod + '</b>\n'
+                                     + ' on ' + '<b>' + current_datetime + '</b>\n\n'
+                                     + 'Your order number is ' + str(order_id)
+                                     + '\nThanks for the order!')
         else:
             print('Chat message:')
             pprint(msg)
@@ -133,15 +176,17 @@ def send_invoice(seed_tuple):
 
                     else:
                         description = datetime.now().strftime('%Y-%m-%d %H:%M:%S') + '\n\n'
+                        this_payload = 'CC:'
                         for order in orders_dict['orders']:
                             for item in order['orders']:
                                 description += str(item[0]) + ' (${:.2f})\n'.format(int(item[1])/100)
+                                this_payload += str(item[0]).replace(' ', '_') + ':'
 
                         sent = bot.sendInvoice(
                             chat_id=chat_id,
                             title='Checkout Cart',
                             description=description,
-                            payload='test',
+                            payload=this_payload,
                             provider_token=Token.PAYMENT_PROVIDER_TOKEN,
                             start_parameter=order['chat_id'],
                             currency='SGD',
@@ -193,6 +238,9 @@ def send_invoice(seed_tuple):
                     order['orders'] = []
                     with open('order_list.json', 'w') as outfile:
                         json.dump(orders_dict, outfile)
+                    bot.sendMessage(chat_id,
+                                    text='Cart is empty!\n'
+                                         'Start browsing more items at /menu!')
                     break
 
         elif msg['text'][:4] == '/add':  # add individual items to order list
@@ -214,11 +262,13 @@ def send_invoice(seed_tuple):
                                 if name_to_compare.replace('UP', '') == str(i['backend_name']).upper():
                                     if msg['text'][-2:].upper() == 'UP':
                                         order['orders'].append([str(i['frontend_name'])+' Upsize', int(i['price_upsize'])])
-                                        bot.sendMessage(chat_id, text='Item added to cart! View /cart!')
+                                        bot.sendMessage(chat_id, text='Item added to cart! View /cart!\n'
+                                                                      'Continue browsing at /menu!')
                                         break
                                     else:
                                         order['orders'].append([str(i['frontend_name']), int(i['price'])])
-                                        bot.sendMessage(chat_id, text='Item added to cart! View /cart!')
+                                        bot.sendMessage(chat_id, text='Item added to cart! View /cart!\n'
+                                                                      'Continue browsing at /menu!')
                                         break
                             else:
                                 bot.sendMessage(chat_id, text='No item added, try again?')
