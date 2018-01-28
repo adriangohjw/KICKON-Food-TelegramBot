@@ -28,7 +28,7 @@ def get_num_entry():
     return max
 
 
-def push_order(order_id, chat_id, name, phone_no, prod, current_datetime):
+def push_order(order_id, chat_id, name, phone_no, prod, current_datetime, upsize=0):
     data = {
         "id": order_id,
         "name": '{}'.format(name),
@@ -38,6 +38,7 @@ def push_order(order_id, chat_id, name, phone_no, prod, current_datetime):
         "product": '{}'.format(prod),
         "is_completed": 0,
         "stage": 0,
+        "upsize": upsize
     }
     db.child("orders").child(order_id).set(data)
     print('uploaded')
