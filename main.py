@@ -205,6 +205,14 @@ def send_invoice(seed_tuple):
                 bot.sendMessage(chat_id, text='No item in cart!\n'
                                               'Add them from /menu now!')
 
+        elif msg['text'] == '/orderStatus':  # view cart
+            incomplete_list = pb.get_pending_orders(chat_id=chat_id)
+            to_sent_str = ''
+            for item in incomplete_list:
+                to_sent_str += 'Order: ' + str(item['id']) + '\n'
+                to_sent_str += item['product'] + '\n\n'
+            bot.sendMessage(chat_id, text=to_sent_str)
+
         elif msg['text'] == '/cart':  # view cart
 
             for order in orders_dict['orders']:

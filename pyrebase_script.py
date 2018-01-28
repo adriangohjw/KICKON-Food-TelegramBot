@@ -1,5 +1,4 @@
 import pyrebase
-from datetime import datetime
 
 # set up config
 config = {
@@ -42,3 +41,16 @@ def push_order(order_id, chat_id, name, phone_no, prod, current_datetime, upsize
     }
     db.child("orders").child(order_id).set(data)
     print('uploaded')
+
+
+def get_pending_orders(chat_id):
+    new_list = []
+    orders = db.child("orders").get()
+    data = orders.val()
+    for i in data:
+        try:
+            if i['chat_id'] == str(chat_id) and i['is_completed'] == 0:
+                new_list.append(i)
+        except:
+            pass
+    return new_list
