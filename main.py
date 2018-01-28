@@ -176,6 +176,7 @@ def send_invoice(seed_tuple):
                         description += '\n'
                         for item in order['orders']:
                             description += '/drop_' + str(item[0]).replace(' ', '_') + '\n'
+                        description += '\nEmpty cart: /clearCart'
                         bot.sendMessage(chat_id, text=description, parse_mode='HTML')
                         break
 
@@ -185,6 +186,14 @@ def send_invoice(seed_tuple):
                     json.dump(orders_dict, outfile)
                 bot.sendMessage(chat_id, text='No item in cart!\n'
                                               'Add them from /menu now!')
+
+        elif msg['text'] == '/clearCart':  # empty cart
+            for order in orders_dict['orders']:
+                if chat_id == order['chat_id']:
+                    order['orders'] = []
+                    with open('order_list.json', 'w') as outfile:
+                        json.dump(orders_dict, outfile)
+                    break
 
         elif msg['text'][:4] == '/add':  # add individual items to order list
 
