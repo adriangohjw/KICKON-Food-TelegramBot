@@ -65,7 +65,7 @@ class OrderProcessor(telepot.helper.InvoiceHandler):
                 all_items_list = all_items.split(':')
                 all_items_list.pop(len(all_items_list)-1)
                 for item in all_items_list:
-                    order_id = int(pb.get_num_entry()) + 1  
+                    order_id = int(pb.get_num_entry()) + 1
                     if 'UPSIZE' in item:
                         pb.push_order(order_id=order_id,
                                       chat_id=int(chat_id),
@@ -73,7 +73,7 @@ class OrderProcessor(telepot.helper.InvoiceHandler):
                                       phone_no=int(phone_no),
                                       prod=str(item),
                                       current_datetime=current_datetime,
-                                      upsized=1)
+                                      upsize=1)
                     else:
                         pb.push_order(order_id=order_id,
                                       chat_id=int(chat_id),
@@ -83,7 +83,7 @@ class OrderProcessor(telepot.helper.InvoiceHandler):
                                       current_datetime=current_datetime)
                     bot.sendMessage(chat_id=chat_id, parse_mode='HTML',
                                     text='Hi ' + '<b>' + name + '</b>\n'
-                                         + 'You purchased ' + '<b>' + prod + '</b>\n'
+                                         + 'You purchased ' + '<b>' + item + '</b>\n'
                                          + ' on ' + '<b>' + current_datetime + '</b>\n\n'
                                          + 'Your order number is ' + str(order_id)
                                          + '\nThanks for the order!')
@@ -94,6 +94,7 @@ class OrderProcessor(telepot.helper.InvoiceHandler):
                             json.dump(orders_dict, outfile)
                         break
             else:
+                order_id = int(pb.get_num_entry()) + 1
                 if 'UPSIZE' in str(prod).upper():
                     pb.push_order(order_id=order_id,
                                   chat_id=int(chat_id),
@@ -101,7 +102,7 @@ class OrderProcessor(telepot.helper.InvoiceHandler):
                                   phone_no=int(phone_no),
                                   prod=str(prod),
                                   current_datetime=current_datetime,
-                                  upsized=1)
+                                  upsize=1)
                 else:
                     pb.push_order(order_id=order_id,
                                   chat_id=int(chat_id),
@@ -370,7 +371,7 @@ def send_invoice(seed_tuple):
                 if name_to_compare.replace("UP", "") == str(i['backend_name']).upper():
 
                     if name_to_compare[-2:] == "UP":
-                        title = i['frontend_name'] + ' Upsized'
+                        title = i['frontend_name'] + ' Upsize'
                         label = 'Meal - Upsize'
                         price = i['price_upsize']
                     else:
