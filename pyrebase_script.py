@@ -3,12 +3,12 @@ from datetime import datetime
 
 # set up config
 config = {
-    "apiKey": "AIzaSyA6wq4CsF4tGZ5eGmwQDDb3Seexra9GEsk",
-    "authDomain": "kickon-food.firebaseapp.com",
-    "databaseURL": "https://kickon-food.firebaseio.com",
-    "storageBucket": "kickon-food.appspot.com",
+    "apiKey": "",
+    "authDomain": "",
+    "databaseURL": "",
+    "storageBucket": "",
     # change this path on a separate server
-    "serviceAccount": "kickon_food_secret.json"
+    "serviceAccount": "" 
 }
 
 firebase = pyrebase.initialize_app(config)
